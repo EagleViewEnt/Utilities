@@ -1,0 +1,16 @@
+﻿name: Release
+on: { push: { tags: [ "v*.*.*" ] } }
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: 9.0.x }
+      - name: Restore
+        run: dotnet restore
+      - name: Publish
+        run: dotnet publish ./src/EagleViewEnt.TaxStationPro.App/EagleViewEnt.TaxStationPro.App.csproj -c Release -o artifacts
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with: { name: TaxStationPro_App_Publish, path: artifacts/** }

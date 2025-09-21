@@ -1,0 +1,24 @@
+﻿LICENSE (Proprietary)
+
+Copyright (c) 2025 EagleViewEnt. All rights reserved.
+
+1) Ownership
+This software (the "Software") is the exclusive property of EagleViewEnt.
+
+2) Permitted Use
+Use is permitted solely within the scope of agreements with EagleViewEnt.
+No license is granted to copy, modify, merge, publish, distribute, sublicense, sell, or create derivative works outside authorized agreements.
+
+3) Derivative Works
+Any modifications or derivative works become the exclusive property of EagleViewEnt.
+
+4) Disclaimer of Warranty
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+5) Limitation of Liability
+In no event shall EagleViewEnt be liable for any claim, damages, or other liability arising from the Software.
+
+6) Governing Law
+This License is governed by the laws applicable to agreements with EagleViewEnt.
+
+Proprietary and Confidential — Unauthorized use is prohibited.

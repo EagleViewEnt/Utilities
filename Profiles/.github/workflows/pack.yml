@@ -1,0 +1,26 @@
+﻿name: Pack and Publish
+on:
+  push: { tags: [ "v*.*.*" ] }
+  workflow_dispatch: {}
+jobs:
+  pack:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: 9.0.x }
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Test
+        run: dotnet test -c Release --no-build
+      - name: Pack libraries
+        run: |
+          Get-ChildItem src -Recurse -Filter *.csproj | ForEach-Object {
+            dotnet pack $_.FullName -c Release -o artifacts --no-build
+          }
+      - name: Push to GitHub Packages
+        env: { NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
+        run: |
+          dotnet nuget push "artifacts\*.nupkg" --api-key "$env:NUGET_AUTH_TOKEN" --source "https://nuget.pkg.github.com/EagleViewEnt/index.json" --skip-duplicate

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Data\EagleViewEnt.TaxStationPro.Customers.Riverside.Data.csproj" />
+    <ProjectReference Include="..\Resources\EagleViewEnt.TaxStationPro.Customers.Riverside.Resources.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+</Project>
