@@ -2,7 +2,7 @@
 
 on:
   push:
-    branches: [ main ]   # <-- change if your default branch isn’t 'main'
+    branches: [ main ]     # change if your default branch differs
     paths:
       - 'src/**'
       - 'Directory.Packages.props'
@@ -17,65 +17,46 @@ permissions:
 jobs:
   publish:
     runs-on: windows-latest
-
     env:
-      # Unique prerelease version for this run to avoid 'skip-duplicate' noise
       CI_VERSION: 0.0.0-ci.${{ github.run_number }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '9.0.x' }
 
-      - name: Restore (solution-wide)
+      - name: Restore
         run: dotnet restore
 
-      # Find changed projects in this push (compares previous SHA to current SHA)
+      # Detect changed projects in this push
       - name: Detect changed projects
         id: changes
         shell: pwsh
         run: |
           $before = "${{ github.event.before }}"
           $after  = "${{ github.sha }}"
-          if (-not $before) { $before = "$after^" }  # first push fallback
+          if (-not $before) { $before = "$after^" }
 
           $changed = git diff --name-only $before $after | Where-Object { $_ -like "src/*" }
           $projSet = @{}
-
           foreach ($f in $changed) {
-            if ($f -match '\.csproj$') {
-              $full = $f
-            } else {
-              # Walk up to find a .csproj in the changed directory
+            $csproj = ''
+            if ($f -match '\.csproj$') { $csproj = $f }
+            else {
               $dir = Split-Path $f -Parent
               while ($dir -and -not (Test-Path (Join-Path $dir "*.csproj"))) {
-                $parent = Split-Path $dir -Parent
-                if ($parent -eq $dir) { break }
-                $dir = $parent
+                $p = Split-Path $dir -Parent; if ($p -eq $dir) { break } ; $dir = $p
               }
-              if ($dir -and (Get-ChildItem (Join-Path $dir "*.csproj") -ErrorAction SilentlyContinue)) {
-                $full = (Get-ChildItem (Join-Path $dir "*.csproj")).FullName
-              } else {
-                continue
-              }
+              if ($dir) { $c = Get-ChildItem (Join-Path $dir "*.csproj") -ErrorAction SilentlyContinue; if ($c) { $csproj = $c[0].FullName } }
             }
-            # Filter out test projects
-            if ($full -notmatch '\.Tests\.csproj$') {
-              $projSet[$full] = $true
-            }
+            if ($csproj -and $csproj -notmatch '\.Tests\.csproj$') { $projSet[$csproj] = $true }
           }
-
-          if ($projSet.Keys.Count -eq 0) {
-            "changed=none" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          } else {
+          if ($projSet.Keys.Count -eq 0) { "changed=none" | Out-File -FilePath $env:GITHUB_OUTPUT -Append }
+          else {
             $list = ($projSet.Keys | Sort-Object) -join "`n"
             "changed=$list" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "Changed projects:`n$list"
           }
 
       - name: Skip if nothing to publish
@@ -91,23 +72,34 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          $projects = @()
-          $projects = @(@"
+          @"
 ${{ steps.changes.outputs.changed }}
-"@.Trim().Split("`n")) | Where-Object { $_ -ne "" }
-
-          foreach ($p in $projects) {
-            Write-Host "Packing: $p"
-            dotnet pack "$p" -c Release -o artifacts --no-build /p:Version=${{ env.CI_VERSION }}
+"@.Trim().Split("`n") | Where-Object { $_ } | ForEach-Object {
+            dotnet pack $_ -c Release -o artifacts --no-build /p:Version=${{ env.CI_VERSION }}
           }
+
+      - name: Upload packages
+        if: steps.changes.outputs.changed != 'none'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs
+          path: artifacts/*.nupkg
+
+      - name: Upload symbols
+        if: steps.changes.outputs.changed != 'none'
+        uses: actions/upload-artifact@v4
+        with:
+          name: snupkgs
+          path: artifacts/*.snupkg
 
       - name: Push to GitHub Packages
         if: steps.changes.outputs.changed != 'none'
         shell: pwsh
         run: |
+          $source = "https://nuget.pkg.github.com/EagleViewEnt/index.json"
           Get-ChildItem artifacts -Filter *.nupkg | ForEach-Object {
-            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source $source --skip-duplicate
           }
           Get-ChildItem artifacts -Filter *.snupkg | ForEach-Object {
-            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source $source --skip-duplicate
           }

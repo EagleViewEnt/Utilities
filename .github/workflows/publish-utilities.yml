@@ -1,11 +1,10 @@
-
-name: Pack & Publish (Utilities Packages)
+﻿name: Pack & Publish (Stable by Tag)
 
 on:
   push:
     tags:
       - 'utilities-*-v*'   # e.g., utilities-core-v1.0.0
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -14,15 +13,12 @@ permissions:
 jobs:
   pack-publish:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
       - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+        with: { dotnet-version: '9.0.x' }
 
       - name: Restore
         run: dotnet restore
@@ -37,11 +33,13 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
-          if ($tag -notmatch '^utilities-(.+)-v(.+)$') { throw "Bad tag format: $tag (expected utilities-<key>-v<version>)" }
+          if ($tag -notmatch '^utilities-(.+)-v(.+)$') { throw "Bad tag: $tag (expected utilities-<key>-v<version>)" }
           $name = $Matches[1].ToLowerInvariant()
           $version = $Matches[2]
           $map = @{
             "core"          = "src/EagleViewEnt.Utilities/Core/EagleViewEnt.Utilities.Core.csproj"
+            "logging"       = "src/EagleViewEnt.Utilities/Logging/EagleViewEnt.Utilities.Logging.csproj"
+            "types"         = "src/EagleViewEnt.Utilities/Types/EagleViewEnt.Utilities.Types.csproj"
             "data"          = "src/EagleViewEnt.Utilities/Data/EagleViewEnt.Utilities.Data.csproj"
             "external"      = "src/EagleViewEnt.Utilities/External/EagleViewEnt.Utilities.External.csproj"
             "localization"  = "src/EagleViewEnt.Utilities/Localization/EagleViewEnt.Utilities.Localization.csproj"
@@ -49,17 +47,27 @@ jobs:
             "security"      = "src/EagleViewEnt.Utilities/Security/EagleViewEnt.Utilities.Security.csproj"
             "serialization" = "src/EagleViewEnt.Utilities/Serialization/EagleViewEnt.Utilities.Serialization.csproj"
             "windows"       = "src/EagleViewEnt.Utilities/Windows/EagleViewEnt.Utilities.Windows.csproj"
-            "testing"       = "src/EagleViewEnt.Utilities/Utilities.Testing/EagleViewEnt.Utilities.Testing.csproj"
           }
           if (-not $map.ContainsKey($name)) { throw "Unknown package key: $name" }
           "proj=$($map[$name])" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "version=$version"   | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Pack (Release)
-        run: dotnet pack "${{ steps.proj.outputs.proj }}" -c Release -o .\artifacts\packages /p:Version=${{ steps.proj.outputs.version }}
+        run: dotnet pack "${{ steps.proj.outputs.proj }}" -c Release -o artifacts /p:Version=${{ steps.proj.outputs.version }}
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg
 
       - name: Push to GitHub Packages
+        shell: pwsh
         run: |
-          for %%f in (.rtifacts\packages\*.nupkg) do dotnet nuget push "%%f" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
-          for %%f in (.rtifacts\packages\*.snupkg) do dotnet nuget push "%%f" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
-        shell: cmd
+          $source = "https://nuget.pkg.github.com/EagleViewEnt/index.json"
+          Get-ChildItem artifacts -Filter *.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source $source --skip-duplicate
+          }
+          Get-ChildItem artifacts -Filter *.snupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source $source --skip-duplicate
+          }
