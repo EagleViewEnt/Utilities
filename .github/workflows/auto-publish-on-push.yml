@@ -1,0 +1,113 @@
+﻿name: Auto Publish NuGet on Push
+
+on:
+  push:
+    branches: [ main ]   # <-- change if your default branch isn’t 'main'
+    paths:
+      - 'src/**'
+      - 'Directory.Packages.props'
+      - 'Directory.Build.props'
+      - 'nuget.config'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    env:
+      # Unique prerelease version for this run to avoid 'skip-duplicate' noise
+      CI_VERSION: 0.0.0-ci.${{ github.run_number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore (solution-wide)
+        run: dotnet restore
+
+      # Find changed projects in this push (compares previous SHA to current SHA)
+      - name: Detect changed projects
+        id: changes
+        shell: pwsh
+        run: |
+          $before = "${{ github.event.before }}"
+          $after  = "${{ github.sha }}"
+          if (-not $before) { $before = "$after^" }  # first push fallback
+
+          $changed = git diff --name-only $before $after | Where-Object { $_ -like "src/*" }
+          $projSet = @{}
+
+          foreach ($f in $changed) {
+            if ($f -match '\.csproj$') {
+              $full = $f
+            } else {
+              # Walk up to find a .csproj in the changed directory
+              $dir = Split-Path $f -Parent
+              while ($dir -and -not (Test-Path (Join-Path $dir "*.csproj"))) {
+                $parent = Split-Path $dir -Parent
+                if ($parent -eq $dir) { break }
+                $dir = $parent
+              }
+              if ($dir -and (Get-ChildItem (Join-Path $dir "*.csproj") -ErrorAction SilentlyContinue)) {
+                $full = (Get-ChildItem (Join-Path $dir "*.csproj")).FullName
+              } else {
+                continue
+              }
+            }
+            # Filter out test projects
+            if ($full -notmatch '\.Tests\.csproj$') {
+              $projSet[$full] = $true
+            }
+          }
+
+          if ($projSet.Keys.Count -eq 0) {
+            "changed=none" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            $list = ($projSet.Keys | Sort-Object) -join "`n"
+            "changed=$list" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
+
+      - name: Skip if nothing to publish
+        if: steps.changes.outputs.changed == 'none'
+        run: echo "No packable project changes detected; skipping."
+
+      - name: Build (Release)
+        if: steps.changes.outputs.changed != 'none'
+        run: dotnet build -c Release --no-restore
+
+      - name: Pack changed projects
+        if: steps.changes.outputs.changed != 'none'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          $projects = @()
+          $projects = @(@"
+${{ steps.changes.outputs.changed }}
+"@.Trim().Split("`n")) | Where-Object { $_ -ne "" }
+
+          foreach ($p in $projects) {
+            Write-Host "Packing: $p"
+            dotnet pack "$p" -c Release -o artifacts --no-build /p:Version=${{ env.CI_VERSION }}
+          }
+
+      - name: Push to GitHub Packages
+        if: steps.changes.outputs.changed != 'none'
+        shell: pwsh
+        run: |
+          Get-ChildItem artifacts -Filter *.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+          }
+          Get-ChildItem artifacts -Filter *.snupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+          }
