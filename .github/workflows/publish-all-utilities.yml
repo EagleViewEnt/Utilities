@@ -1,11 +1,10 @@
-
-name: Pack & Publish All Utilities (Manual)
+name: "Pack & Publish All Utilities (Manual)"
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g., 1.0.0)'
+        description: "Version to publish (e.g., 1.0.0)"
         required: true
         type: string
 
@@ -16,6 +15,7 @@ permissions:
 jobs:
   pack-publish-all:
     runs-on: windows-latest
+
     strategy:
       matrix:
         proj:
@@ -35,16 +35,20 @@ jobs:
             path: src/EagleViewEnt.Utilities/Serialization/EagleViewEnt.Utilities.Serialization.csproj
           - name: windows
             path: src/EagleViewEnt.Utilities/Windows/EagleViewEnt.Utilities.Windows.csproj
-          - name: testing
-            path: src/EagleViewEnt.Utilities/Utilities.Testing/EagleViewEnt.Utilities.Testing.csproj
+          # If you DON'T want to publish Testing, remove this entry or set IsPackable=false in its csproj
+          # - name: testing
+          #   path: src/EagleViewEnt.Utilities/Utilities.Testing/EagleViewEnt.Utilities.Testing.csproj
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
 
       - name: Restore
         run: dotnet restore
@@ -52,13 +56,24 @@ jobs:
       - name: Build & Test
         run: |
           dotnet build -c Release --no-restore
-          dotnet test -c Release --no-build
+          dotnet test  -c Release --no-build
 
       - name: Pack (Release)
-        run: dotnet pack "${{ matrix.proj.path }}" -c Release -o .\artifacts\packages /p:Version=${{ inputs.version }}
+        run: dotnet pack "${{ matrix.proj.path }}" -c Release -o ./artifacts/packages /p:Version=${{ inputs.version }}
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-${{ matrix.proj.name }}
+          path: artifacts/packages/*.nupkg
 
       - name: Push to GitHub Packages
+        shell: pwsh
         run: |
-          for %%f in (.rtifacts\packages\*.nupkg) do dotnet nuget push "%%f" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
-          for %%f in (.rtifacts\packages\*.snupkg) do dotnet nuget push "%%f" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
-        shell: cmd
+          $source = "https://nuget.pkg.github.com/EagleViewEnt/index.json"
+          Get-ChildItem -Path "artifacts/packages" -Filter *.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source $source --skip-duplicate
+          }
+          Get-ChildItem -Path "artifacts/packages" -Filter *.snupkg | ForEach-Object {
+            dotnet nuget push $_.FullName --api-key ${{ secrets.GITHUB_TOKEN }} --source $source --skip-duplicate
+          }

@@ -45,8 +45,7 @@ namespace EagleViewEnt.Utilities.Core.Types.Money;
 ///  formatting uses the culture associated with <see cref="Currency" />.
 /// </remarks>
 [XmlRoot("Money")]
-[JsonConverter(typeof(EveMoneyJsonConverter)),
-    TypeConverter(typeof(EveMoneyEFCoreConverter))]
+[JsonConverter(typeof(EveMoneyJsonConverter)), TypeConverter(typeof(EveMoneyEFCoreConverter))]
 public record struct EveMoney( decimal Value, EveCurrency Currency )
 {
 
