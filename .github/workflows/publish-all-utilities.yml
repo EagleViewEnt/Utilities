@@ -1,0 +1,64 @@
+
+name: Pack & Publish All Utilities (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  pack-publish-all:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        proj:
+          - name: core
+            path: src/EagleViewEnt.Utilities/Core/EagleViewEnt.Utilities.Core.csproj
+          - name: data
+            path: src/EagleViewEnt.Utilities/Data/EagleViewEnt.Utilities.Data.csproj
+          - name: external
+            path: src/EagleViewEnt.Utilities/External/EagleViewEnt.Utilities.External.csproj
+          - name: localization
+            path: src/EagleViewEnt.Utilities/Localization/EagleViewEnt.Utilities.Localization.csproj
+          - name: media
+            path: src/EagleViewEnt.Utilities/Media/EagleViewEnt.Utilities.Media.csproj
+          - name: security
+            path: src/EagleViewEnt.Utilities/Security/EagleViewEnt.Utilities.Security.csproj
+          - name: serialization
+            path: src/EagleViewEnt.Utilities/Serialization/EagleViewEnt.Utilities.Serialization.csproj
+          - name: windows
+            path: src/EagleViewEnt.Utilities/Windows/EagleViewEnt.Utilities.Windows.csproj
+          - name: testing
+            path: src/EagleViewEnt.Utilities/Utilities.Testing/EagleViewEnt.Utilities.Testing.csproj
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build & Test
+        run: |
+          dotnet build -c Release --no-restore
+          dotnet test -c Release --no-build
+
+      - name: Pack (Release)
+        run: dotnet pack "${{ matrix.proj.path }}" -c Release -o .\artifacts\packages /p:Version=${{ inputs.version }}
+
+      - name: Push to GitHub Packages
+        run: |
+          for %%f in (.rtifacts\packages\*.nupkg) do dotnet nuget push "%%f" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+          for %%f in (.rtifacts\packages\*.snupkg) do dotnet nuget push "%%f" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+        shell: cmd

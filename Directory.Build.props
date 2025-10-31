@@ -1,0 +1,26 @@
+
+<Project>
+  <PropertyGroup>
+    <Company>EagleViewEnt</Company>
+    <Authors>EagleViewEnt</Authors>
+    <RepositoryUrl>https://github.com/EagleViewEnt/Utilities</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- NuGet packaging defaults for all projects -->
+    <IsPackable>true</IsPackable>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

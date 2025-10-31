@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+
+    <!-- Package identity -->
+    <PackageId>EagleViewEnt.Utilities.Testing</PackageId>
+    <Description>Testing utilities for EagleViewEnt solutions (not packaged by default).</Description>
+    <PackageTags>EagleViewEnt;utilities;testing</PackageTags>
+
+    <!-- Optional icon; include file next to csproj to use -->
+    <PackageIcon>icon.png</PackageIcon>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" Condition="Exists('README.md')" />
+    <None Include="icon.png"  Pack="true" PackagePath="/" Condition="Exists('icon.png')" />
+  </ItemGroup>
+</Project>

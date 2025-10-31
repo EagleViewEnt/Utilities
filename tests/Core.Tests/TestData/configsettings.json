@@ -1,0 +1,51 @@
+{
+  "RequestUrl": "http://localhost:7171/MockDataApi",
+  "Polling": 15,
+  "OBSAddress": "ws://127.0.0.1:4455",
+  "OBSSceneName": "Main",
+
+  "OBSMapping": [
+    {
+      "SourceName": "Group",
+      "MinTrigger": 0,
+      "SceneDuration": 5,
+      "Exact": false
+    },
+
+    {
+      "SourceName": "Hal9000",
+      "MinTrigger": 200,
+      "SceneDuration": 5,
+      "Exact": false
+    },
+
+    {
+      "SourceName": "My Brains",
+      "MinTrigger": 300,
+      "SceneDuration": 5,
+      "Exact": false
+    },
+
+    {
+      "SourceName": "Mostly Dead",
+      "MinTrigger": 400,
+      "SceneDuration": 5,
+      "Exact": false
+    },
+
+    {
+      "SourceName": "Inconceivable",
+      "MinTrigger": 111,
+      "SceneDuration": 5,
+      "Exact": true
+    },
+    {
+      "SourceName": "Countdown",
+      "MinTrigger": 222,
+      "SceneDuration": 5,
+      "Exact": true
+    }
+  ]
+
+
+}

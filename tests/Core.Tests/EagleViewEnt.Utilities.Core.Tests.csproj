@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Json\**" />
+    <Compile Remove="Models\**" />
+    <EmbeddedResource Remove="Json\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Json\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extensions\ObjectMappingExtensionsTests.cs" />
+    <Compile Remove="Types\MoneyTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\DateAndTime\" />
+    <Folder Include="Extensions\JsInterop\" />
+    <Folder Include="Extensions\Logger\" />
+    <Folder Include="Extensions\Models\" />
+    <Folder Include="Extensions\Navigation\" />
+    <Folder Include="Extensions\Numeric\" />
+    <Folder Include="Extensions\String\" />
+    <Folder Include="Types\SequentialGuid\" />
+    <Folder Include="Types\Unicode\" />
+    <Folder Include="Types\ValueTypes\" />
+    <Folder Include="Types\XmlString\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\MgbUtilties.Core.csproj" />
+    <ProjectReference Include="..\Serialization\MgbUtilties.Serialization.csproj" />
+  </ItemGroup>
+
+</Project>

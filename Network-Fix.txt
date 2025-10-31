@@ -1,0 +1,184 @@
+<# 
+Fix-KB5065432-Network.ps1
+- Stops Windows Update so KB won't immediately reinstall
+- Uninstalls KB5065432 (wusa; fallback to DISM package removal)
+- Resets network stack (Winsock/TCP/IP/DNS)
+- Restores services and reboots
+
+Usage: Run in an elevated PowerShell window.
+#>
+
+#----- Safety: Must be elevated
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+  Write-Error "Please run this script as Administrator."
+  exit 1
+}
+
+$ErrorActionPreference = 'Stop'
+$kb = 'KB5065432'
+$logDir = "$env:ProgramData\KB_Fix_Logs"
+$newline = "`r`n"
+New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+$log = Join-Path $logDir ("Fix-{0}-{1:yyyyMMdd-HHmmss}.log" -f $kb, (Get-Date))
+
+Start-Transcript -Path $log -Append | Out-Null
+
+function Write-Info($msg) { Write-Host "[*] $msg" -ForegroundColor Cyan }
+function Write-Ok($msg)   { Write-Host "[✓] $msg" -ForegroundColor Green }
+function Write-Warn($msg) { Write-Warning $msg }
+function Write-Err($msg)  { Write-Host "[x] $msg" -ForegroundColor Red }
+
+#----- Step 1: Quiesce Windows Update (prevent auto-reinstall while we work)
+$wuServices = @('wuauserv','bits','dosvc','cryptsvc')
+$svcState = @{}
+
+Write-Info "Stopping Windows Update related services…"
+foreach ($s in $wuServices) {
+  try {
+    $service = Get-Service -Name $s -ErrorAction Stop
+    $svcState[$s] = @{
+      StartType = (Get-WmiObject -Class Win32_Service -Filter "Name='$s'").StartMode
+      Status    = $service.Status
+    }
+    if ($service.Status -ne 'Stopped') { Stop-Service -Name $s -Force -ErrorAction SilentlyContinue }
+    # Temporarily disable start type to block auto-start while we uninstall
+    sc.exe config $s start= disabled | Out-Null
+  } catch {
+    Write-Warn "Could not adjust service $s: $($_.Exception.Message)"
+  }
+}
+Write-Ok "Windows Update services stopped & disabled temporarily."
+
+#----- Step 2: Detect if KB is installed
+$kbInstalled = $false
+try {
+  $hotfix = Get-HotFix -Id $kb -ErrorAction SilentlyContinue
+  if ($hotfix) { $kbInstalled = $true }
+} catch { }
+
+if (-not $kbInstalled) {
+  Write-Warn "$kb not found via Get-HotFix. It might still be present as a package. Continuing…"
+} else {
+  Write-Info "$kb detected via Get-HotFix."
+}
+
+#----- Step 3: Try WUSA uninstall first
+$wusaRemoved = $false
+try {
+  Write-Info "Attempting uninstall via WUSA…"
+  $p = Start-Process -FilePath "$env:SystemRoot\System32\wusa.exe" -ArgumentList "/uninstall /kb:$($kb.TrimStart('KB')) /quiet /norestart" -PassThru -Wait
+  # WUSA exit codes are not always reliable; verify by re-checking
+  Start-Sleep -Seconds 5
+  $stillThere = Get-HotFix -Id $kb -ErrorAction SilentlyContinue
+  if (-not $stillThere) {
+    $wusaRemoved = $true
+    Write-Ok "WUSA reported success (or no longer detected via Get-HotFix)."
+  } else {
+    Write-Warn "WUSA completed but $kb still appears installed."
+  }
+} catch {
+  Write-Warn "WUSA uninstall failed: $($_.Exception.Message)"
+}
+
+#----- Step 4: If needed, DISM fallback (remove the package identity)
+$dismRemoved = $false
+if (-not $wusaRemoved) {
+  try {
+    Write-Info "Searching for package identity via DISM…"
+    $pkgList = & dism.exe /Online /Get-Packages /Format:Table
+    $pkgName = ($pkgList | Select-String -SimpleMatch $kb | ForEach-Object {
+      ($_ -split '\s{2,}')[0]
+    } | Select-Object -First 1)
+
+    if ($pkgName) {
+      Write-Info "Found package: $pkgName"
+      Write-Info "Removing package with DISM (this may take several minutes)…"
+      & dism.exe /Online /Remove-Package /PackageName:$pkgName /NoRestart | Tee-Object -FilePath (Join-Path $logDir "dism-remove-$($kb).log")
+      Start-Sleep -Seconds 5
+      # Re-check
+      $pkgList2 = & dism.exe /Online /Get-Packages /Format:Table
+      if (-not ($pkgList2 | Select-String -SimpleMatch $kb)) {
+        $dismRemoved = $true
+        Write-Ok "DISM removal appears successful."
+      } else {
+        Write-Warn "DISM completed but package still present."
+      }
+    } else {
+      Write-Warn "Could not find a DISM package entry containing $kb."
+    }
+  } catch {
+    Write-Warn "DISM removal failed: $($_.Exception.Message)"
+  }
+}
+
+if (-not ($wusaRemoved -or $dismRemoved)) {
+  Write-Err "Unable to confirm removal of $kb via WUSA or DISM. You can try WinRE: Troubleshoot → Advanced options → Uninstall Updates → Uninstall latest QUALITY update."
+}
+
+#----- Step 5: Network stack reset (do this even if uninstall failed; may still restore connectivity)
+Write-Info "Resetting the network stack…"
+$netCmds = @(
+  'netsh winsock reset',
+  'netsh int ip reset',
+  'ipconfig /flushdns',
+  'ipconfig /release',
+  'ipconfig /renew'
+)
+foreach ($cmd in $netCmds) {
+  try {
+    Write-Info "Running: $cmd"
+    cmd.exe /c $cmd | Out-String | Add-Content -Path $log
+  } catch {
+    Write-Warn "Command failed: $cmd -> $($_.Exception.Message)"
+  }
+}
+Write-Ok "Network stack reset commands executed."
+
+#----- Step 6: Optional adapter refresh (uninstall/reinstall)
+try {
+  Write-Info "Refreshing enabled network adapters (disable/enable)…"
+  $adapters = Get-NetAdapter -Physical | Where-Object { $_.Status -eq 'Up' }
+  foreach ($a in $adapters) {
+    Write-Info "Disabling: $($a.Name)"
+    Disable-NetAdapter -Name $a.Name -Confirm:$false -PassThru | Out-Null
+    Start-Sleep -Seconds 2
+    Write-Info "Enabling: $($a.Name)"
+    Enable-NetAdapter -Name $a.Name -Confirm:$false -PassThru | Out-Null
+  }
+  Write-Ok "Adapter refresh complete."
+} catch {
+  Write-Warn "Adapter refresh skipped/failed: $($_.Exception.Message)"
+}
+
+#----- Step 7: Restore Windows Update services (left disabled until after reboot)
+Write-Info "Restoring Windows Update services' start type to previous values…"
+foreach ($s in $wuServices) {
+  try {
+    $prev = $svcState[$s]
+    if ($null -ne $prev) {
+      $start = $prev.StartType
+      # Map StartMode to sc config values
+      $map = @{
+        'Auto'       = 'auto'
+        'Automatic'  = 'auto'
+        'Manual'     = 'demand'
+        'Disabled'   = 'disabled'
+      }
+      $scStart = $map[$start]
+      if (-not $scStart) { $scStart = 'demand' }
+      sc.exe config $s start= $scStart | Out-Null
+      if ($prev.Status -eq 'Running') { Start-Service -Name $s -ErrorAction SilentlyContinue }
+    } else {
+      sc.exe config $s start= demand | Out-Null
+    }
+  } catch {
+    Write-Warn "Could not restore $s: $($_.Exception.Message)"
+  }
+}
+Write-Ok "Service start types restored."
+
+Write-Info "A reboot is required to finalize removal and network reset."
+Stop-Transcript | Out-Null
+
+# Prompt reboot (5 seconds)
+shutdown.exe /r /t 5 /c "Restarting to finalize KB removal and network reset."

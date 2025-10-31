@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+
+    <!-- Package identity -->
+    <PackageId>EagleViewEnt.Utilities.Windows</PackageId>
+    <Description>Windows-specific helpers (WMI, services, registry, speech).</Description>
+    <PackageTags>EagleViewEnt;utilities;windows</PackageTags>
+
+    <!-- Optional icon; include file next to csproj to use -->
+    <PackageIcon>icon.png</PackageIcon>
+
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" Condition="Exists('README.md')" />
+    <None Include="icon.png"  Pack="true" PackagePath="/" Condition="Exists('icon.png')" />
+  </ItemGroup>
+</Project>

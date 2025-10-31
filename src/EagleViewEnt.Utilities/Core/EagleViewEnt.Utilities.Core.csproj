@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+
+    <!-- Package identity -->
+    <PackageId>EagleViewEnt.Utilities.Core</PackageId>
+    <Description>Core utilities for EagleViewEnt apps (extensions, types, guards).</Description>
+    <PackageTags>EagleViewEnt;utilities;core</PackageTags>
+
+    <!-- Optional icon; include file next to csproj to use -->
+    <PackageIcon>icon.png</PackageIcon>
+
+
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Extensions\Object\**" />
+    <EmbeddedResource Remove="Extensions\Object\**" />
+    <None Remove="Extensions\Object\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Types\Money\Converters\MoneyTypeConverter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" Condition="Exists('README.md')" />
+    <None Include="icon.png" Pack="true" PackagePath="/" Condition="Exists('icon.png')" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Ardalis.SmartEnum" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components" />
+	  <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" />
+	  <PackageReference Include="Microsoft.JSInterop" />
+	  <PackageReference Include="Serilog" />
+
+  </ItemGroup>
+</Project>
