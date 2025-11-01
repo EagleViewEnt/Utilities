@@ -9,7 +9,7 @@
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile Condition="Exists('README.md')">README.md</PackageReadmeFile>
 		<Nullable>enable</Nullable>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 
