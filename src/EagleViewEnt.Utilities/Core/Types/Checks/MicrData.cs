@@ -118,8 +118,11 @@ public sealed partial class Micr : StringValueType<Micr>
             return (new AccountNumber(string.Empty), new RoutingNumber(string.Empty), new CheckNumber(string.Empty));
 
         Match match = MicrRegEx().Match(micr);
+
         RoutingNumber routing = match.Groups["routing"].Value;
+
         AccountNumber account = match.Groups["account"].Value;
+
         CheckNumber check = match.Groups["check"].Value;
 
         return (account, routing, check);
@@ -127,7 +130,7 @@ public sealed partial class Micr : StringValueType<Micr>
     }
 
     /// <summary>
-    ///  Returns the raw MICR string value.
+    ///  Returns the raw MICR string value. TODO: Use formatted output in the future.
     /// </summary>
     /// <returns>The unmodified MICR string.</returns>
     public override string ToString() => Value;
