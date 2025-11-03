@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
 
     <!-- Package identity -->
-    <PackageId>EagleViewEnt.Utilities.Serialization</PackageId>
-    <Description>Serialization helpers for System.Text.Json and XML.</Description>
-    <PackageTags>EagleViewEnt;utilities;serialization;json;xml</PackageTags>
+    <PackageId>EagleViewEnt.Utilities.Serialization.Xml</PackageId>
+    <Description>Serialization helpers for System.Text.Xms.</Description>
+    <PackageTags>EagleViewEnt;utilities;serialization;xml</PackageTags>
 
     <!-- Optional icon; include file next to csproj to use -->
     <PackageIcon>icon.png</PackageIcon>

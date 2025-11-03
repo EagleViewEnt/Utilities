@@ -4,7 +4,7 @@
 
 		<!-- Package identity -->
 		<PackageId>EagleViewEnt.Utilities.Blazor.JSInterop</PackageId>
-		<Description>Serialization helpers for System.Text.Json and XML.</Description>
+		<Description>Blazor helpers for JSinterop and XML.</Description>
 		<PackageTags>EagleViewEnt;utilities;blazor;jsinterop</PackageTags>
 
 		<!-- Optional icon; include file next to csproj to use -->
