@@ -5,11 +5,7 @@ VisualStudioVersion = 17.14.36511.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleViewEnt.Utilities.Core", "src\EagleViewEnt.Utilities\Core\EagleViewEnt.Utilities.Core.csproj", "{FF21394C-C5A8-85E1-2622-52E51B1002B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleViewEnt.Utilities.Core.Tests", "tests\Core.Tests\EagleViewEnt.Utilities.Core.Tests.csproj", "{1FE7B2D9-9FE7-505D-5EE8-C5B226644846}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleViewEnt.Utilities.Logging", "src\EagleViewEnt.Utilities\Logging\EagleViewEnt.Utilities.Logging.csproj", "{12BCD97B-193F-405D-85B4-E325C6DDC260}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleViewEnt.Utilities.Serialization.Json", "src\EagleViewEnt.Utilities\Serialization\Json\EagleViewEnt.Utilities.Serialization.Json.csproj", "{A0D99642-F774-3A0E-AA81-E413F4AEFA10}"
 EndProject
@@ -23,8 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JSInterop", "JSInterop", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleViewEnt.Utilities.Blazor.JSInterop", "src\EagleViewEnt.Utilities\Blazor\JSInterop\EagleViewEnt.Utilities.Blazor.JSInterop.csproj", "{C0FFC6F3-D93F-87CA-50CE-802B35C57E70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleViewEnt.Utilities.Mapping", "src\EagleViewEnt.Utilities\Mapping\EagleViewEnt.Utilities.Mapping.csproj", "{619DEEC2-BEAD-4630-98EE-237F3872ACEE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EagleViewEnt.Utilites.EFCore", "src\EagleViewEnt.Utilities\EFCore\EagleViewEnt.Utilites.EFCore.csproj", "{C18C3F26-C2CB-47FE-83B5-C8264C93EAD8}"
 EndProject
 Global
@@ -37,14 +31,6 @@ Global
 		{FF21394C-C5A8-85E1-2622-52E51B1002B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF21394C-C5A8-85E1-2622-52E51B1002B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF21394C-C5A8-85E1-2622-52E51B1002B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1FE7B2D9-9FE7-505D-5EE8-C5B226644846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FE7B2D9-9FE7-505D-5EE8-C5B226644846}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1FE7B2D9-9FE7-505D-5EE8-C5B226644846}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1FE7B2D9-9FE7-505D-5EE8-C5B226644846}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12BCD97B-193F-405D-85B4-E325C6DDC260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12BCD97B-193F-405D-85B4-E325C6DDC260}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12BCD97B-193F-405D-85B4-E325C6DDC260}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12BCD97B-193F-405D-85B4-E325C6DDC260}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A0D99642-F774-3A0E-AA81-E413F4AEFA10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A0D99642-F774-3A0E-AA81-E413F4AEFA10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0D99642-F774-3A0E-AA81-E413F4AEFA10}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,10 +43,6 @@ Global
 		{C0FFC6F3-D93F-87CA-50CE-802B35C57E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0FFC6F3-D93F-87CA-50CE-802B35C57E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0FFC6F3-D93F-87CA-50CE-802B35C57E70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{619DEEC2-BEAD-4630-98EE-237F3872ACEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{619DEEC2-BEAD-4630-98EE-237F3872ACEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{619DEEC2-BEAD-4630-98EE-237F3872ACEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{619DEEC2-BEAD-4630-98EE-237F3872ACEE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C18C3F26-C2CB-47FE-83B5-C8264C93EAD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C18C3F26-C2CB-47FE-83B5-C8264C93EAD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C18C3F26-C2CB-47FE-83B5-C8264C93EAD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -70,7 +52,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1FE7B2D9-9FE7-505D-5EE8-C5B226644846} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{A0D99642-F774-3A0E-AA81-E413F4AEFA10} = {2808571A-5C5F-471E-9BEC-4191656D1798}
 		{53A5BE81-84B4-2CD4-9D0D-DF00C2D1F29A} = {2808571A-5C5F-471E-9BEC-4191656D1798}
 		{28FB7D96-69CE-48D1-9EB9-1C32EA83D413} = {39946ED8-7782-489A-87A8-49B9797D2900}
