@@ -10,7 +10,6 @@
 		<!-- Optional icon; include file next to csproj to use -->
 		<PackageIcon>icon.png</PackageIcon>
 
-
 	</PropertyGroup>
 	
 	<ItemGroup>

@@ -21,18 +21,26 @@ jobs:
         proj:
           - name: core
             path: src/EagleViewEnt.Utilities/Core/EagleViewEnt.Utilities.Core.csproj
+          - name: efcore
+            path: src/EagleViewEnt.Utilities/EFCore/EagleViewEnt.Utilities.EFCore.csproj
           - name: data
             path: src/EagleViewEnt.Utilities/Data/EagleViewEnt.Utilities.Data.csproj
           - name: external
             path: src/EagleViewEnt.Utilities/External/EagleViewEnt.Utilities.External.csproj
           - name: localization
             path: src/EagleViewEnt.Utilities/Localization/EagleViewEnt.Utilities.Localization.csproj
+          - name: logging
+            path: src/EagleViewEnt.Utilities/Logging/EagleViewEnt.Utilities.Logging.csproj
+          - name: mapping
+            path: src/EagleViewEnt.Utilities/Mapping/EagleViewEnt.Utilities.Mapping.csproj
           - name: media
             path: src/EagleViewEnt.Utilities/Media/EagleViewEnt.Utilities.Media.csproj
           - name: security
             path: src/EagleViewEnt.Utilities/Security/EagleViewEnt.Utilities.Security.csproj
-          - name: serialization
-            path: src/EagleViewEnt.Utilities/Serialization/EagleViewEnt.Utilities.Serialization.csproj
+          - name: serialization.json
+            path: src/EagleViewEnt.Utilities/Serialization/Json/EagleViewEnt.Utilities.Serialization.Json.csproj
+          - name: serialization.xml
+            path: src/EagleViewEnt.Utilities/Serialization/Xml/EagleViewEnt.Utilities.Serialization.Xml.csproj
           - name: windows
             path: src/EagleViewEnt.Utilities/Windows/EagleViewEnt.Utilities.Windows.csproj
           # If you DON'T want to publish Testing, remove this entry or set IsPackable=false in its csproj

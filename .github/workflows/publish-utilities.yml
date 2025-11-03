@@ -38,14 +38,17 @@ jobs:
           $version = $Matches[2]
           $map = @{
             "core"          = "src/EagleViewEnt.Utilities/Core/EagleViewEnt.Utilities.Core.csproj"
+            "efcore"        = "src/EagleViewEnt.Utilities/EFCore/EagleViewEnt.Utilities.EFCore.csproj"
             "logging"       = "src/EagleViewEnt.Utilities/Logging/EagleViewEnt.Utilities.Logging.csproj"
             "types"         = "src/EagleViewEnt.Utilities/Types/EagleViewEnt.Utilities.Types.csproj"
             "data"          = "src/EagleViewEnt.Utilities/Data/EagleViewEnt.Utilities.Data.csproj"
             "external"      = "src/EagleViewEnt.Utilities/External/EagleViewEnt.Utilities.External.csproj"
             "localization"  = "src/EagleViewEnt.Utilities/Localization/EagleViewEnt.Utilities.Localization.csproj"
+            "mapping"       = "src/EagleViewEnt.Utilities/Mapping/EagleViewEnt.Utilities.mapping.csproj"
             "media"         = "src/EagleViewEnt.Utilities/Media/EagleViewEnt.Utilities.Media.csproj"
             "security"      = "src/EagleViewEnt.Utilities/Security/EagleViewEnt.Utilities.Security.csproj"
-            "serialization" = "src/EagleViewEnt.Utilities/Serialization/EagleViewEnt.Utilities.Serialization.csproj"
+            "serialization.json" = "src/EagleViewEnt.Utilities/Serialization/Json/EagleViewEnt.Utilities.Serialization.Json.csproj"
+            "serialization.xml" = "src/EagleViewEnt.Utilities/Serialization/Xml/EagleViewEnt.Utilities.Serialization.Xml.csproj"
             "windows"       = "src/EagleViewEnt.Utilities/Windows/EagleViewEnt.Utilities.Windows.csproj"
           }
           if (-not $map.ContainsKey($name)) { throw "Unknown package key: $name" }
