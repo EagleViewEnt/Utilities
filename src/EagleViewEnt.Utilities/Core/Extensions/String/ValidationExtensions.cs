@@ -22,53 +22,43 @@ using System.Linq;
 namespace EagleViewEnt.Utilities.Core.Extensions.String;
 
 /// <summary>
-///  Provides string validation extension methods for common null/empty checks and guard clauses.
+///  Provides string validation extension methods for common null/WhiteSpace checks and guard clauses.
 /// </summary>
 public static class ValidationExtensions
 {
 
     /// <summary>
-    ///  Determines whether the specified string is <see langword="null" /> or an empty string ("").
+    ///  Determines whether the specified string is <see langword="null" /> or an WhiteSpace string ("").
     /// </summary>
     /// <param name="value">The string instance to test.</param>
     /// <returns>
-    ///  <see langword="true" /> if <paramref name="value" /> is <see langword="null" /> or <see cref="string.Empty" />;
-    ///  otherwise, <see langword="false" />.
+    ///  <see langword="true" /> if <paramref name="value" /> is <see langword="null" /> or <see
+    ///  cref="string.IsNullOrWhiteSpace" />; otherwise, <see langword="false" />.
     /// </returns>
-    public static bool IsEmptyOrNull( this string value ) => string.IsNullOrEmpty(value);
+    public static bool IsNullOrWhiteSpace( this string? value ) => string.IsNullOrWhiteSpace(value);
 
     /// <summary>
-    ///  Returns the original string if it is not <see langword="null" /> or empty; otherwise returns the specified
+    ///  Returns the original string if it is not <see langword="null" /> or WhiteSpace; otherwise returns the specified
     ///  default value.
     /// </summary>
     /// <param name="value">The string instance to evaluate.</param>
-    /// <param name="defaultValue">The value to return when <paramref name="value" /> is <see langword="null" /> or empty.</param>
+    /// <param name="defaultValue">The value to return when <paramref name="value" /> is <see langword="null" /> or WhiteSpace.</param>
     /// <returns>
-    ///  <paramref name="value" /> when it is not <see langword="null" /> or empty; otherwise <paramref
+    ///  <paramref name="value" /> when it is not <see langword="null" /> or WhiteSpace; otherwise <paramref
     ///  name="defaultValue" />.
     /// </returns>
-    public static string IsEmptyOrNull( this string value, string defaultValue )
-        => value.IsEmptyOrNull() ? defaultValue : value;
+    public static string IsNullOrWhiteSpace( this string? value, string defaultValue )
+        => value.IsNullOrWhiteSpace() ? defaultValue : (value!);
 
     /// <summary>
-    ///  Determines whether the specified string is not <see langword="null" /> and not empty.
-    /// </summary>
-    /// <param name="value">The string instance to test.</param>
-    /// <returns>
-    ///  <see langword="true" /> if <paramref name="value" /> is not <see langword="null" /> and not <see
-    ///  cref="string.Empty" />; otherwise, <see langword="false" />.
-    /// </returns>
-    public static bool IsNotEmptyOrNull( this string value ) => !string.IsNullOrEmpty(value);
-
-    /// <summary>
-    ///  Throws an <see cref="ArgumentNullException" /> if the provided string is <see langword="null" /> or empty.
+    ///  Throws an <see cref="ArgumentNullException" /> if the provided string is <see langword="null" /> or WhiteSpace.
     /// </summary>
     /// <param name="value">The string instance to validate.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="value" /> is <see langword="null" /> or empty.</exception>
-    public static void ThrowIfNullOrEmpty( this string? value )
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="value" /> is <see langword="null" /> or WhiteSpace.</exception>
+    public static void ThrowIfNullOrWhiteSpace( this string? value )
     {
-        if(string.IsNullOrEmpty(value))
-            throw new ArgumentNullException(value, "Value cannot be null or empty.");
+        if(string.IsNullOrWhiteSpace(value))
+            throw new ArgumentNullException(value, "Value cannot be null or WhiteSpace.");
     }
 
 }

@@ -12,11 +12,6 @@
 
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Extensions\Object\**" />
-    <EmbeddedResource Remove="Extensions\Object\**" />
-    <None Remove="Extensions\Object\**" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Remove="Types\Money\Converters\MoneyTypeConverter.cs" />
   </ItemGroup>
 
@@ -30,8 +25,8 @@
 	  <PackageReference Include="Microsoft.AspNetCore.Components" />
 	  <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore" />
-	  <PackageReference Include="Microsoft.JSInterop" />
 	  <PackageReference Include="Serilog" />
 
   </ItemGroup>
+
 </Project>

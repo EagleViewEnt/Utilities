@@ -20,7 +20,7 @@ using System.Runtime.CompilerServices;
 
 using Serilog;
 
-namespace EagleViewEnt.Utilities.Core.Extensions.Logger;
+namespace EagleViewEnt.Utilities.Logging;
 
 /// <summary>
 ///  Provides extension methods for enhancing <see cref="ILogger" /> instances with additional context information.
@@ -58,11 +58,11 @@ public static partial class LoggerExtensions
     ///  Enriches the logger with contextual information about the calling class and method.
     /// </summary>
     /// <remarks>
-    ///  This method adds two contextual properties to the logger: <list type="bullet"><item><term>ClassName</term>
-    ///  <description>The name of the class derived from the <paramref name="source" /> object.</description></item>
-    ///  <item><term>MethodName</term> <description>The name of the calling method, provided by the <paramref
-    ///  name="memberName" /> parameter.</description></item></list> These properties can be used to enhance log
-    ///  messages with information about where the log entry originated.
+    ///  This method adds two contextual properties to the logger: <list
+    ///  type="bullet"><item><term>ClassName</term><description>The name of the class derived from the <paramref
+    ///  name="source" /> object.</description></item><item><term>MethodName</term> <description>The name of the calling
+    ///  method, provided by the <paramref name="memberName" /> parameter.</description></item></list> These properties
+    ///  can be used to enhance log messages with information about where the log entry originated.
     /// </remarks>
     /// <param name="logger">The logger instance to enrich.</param>
     /// <param name="source">

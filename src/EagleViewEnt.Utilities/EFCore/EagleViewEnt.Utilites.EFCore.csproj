@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+
+		<!-- Package identity -->
+		<PackageId>EagleViewEnt.Utilities.EFCore</PackageId>
+		<Description>EFCore utilities for EagleViewEnt apps (converters).</Description>
+		<PackageTags>EagleViewEnt;utilities;efcore</PackageTags>
+
+		<!-- Only set PackageIcon if the file exists -->
+		<PackageIcon Condition="Exists('icon.png')">icon.png</PackageIcon>
+
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Remove="Types\Money\Converters\MoneyTypeConverter.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="/" Condition="Exists('README.md')" />
+		<None Include="icon.png" Pack="true" PackagePath="/" Condition="Exists('icon.png')" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" />
+		<PackageReference Include="EagleViewEnt.Utilities.Core" />
+		<PackageReference Include="Serilog" />
+
+	</ItemGroup>
+
+</Project>

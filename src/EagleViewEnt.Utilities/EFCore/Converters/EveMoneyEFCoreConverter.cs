@@ -17,31 +17,29 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.ComponentModel;
-using System.Globalization;
 
+using EagleViewEnt.Utilities.Core.Types.Money;
 using EagleViewEnt.Utilities.Core.Types.Money.Enum;
 
-namespace EagleViewEnt.Utilities.Core.Types.Money.Converters
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+namespace EagleViewEnt.Utilites.EFCore.Converters;
+
+/// <summary>
+///  Converts <see cref="EveMoney" /> to <see cref="decimal" /> for storage in T-SQL money columns, and vice versa. The
+///  currency is stored separately as a string column.
+/// </summary>
+public class EveMoneyEFCoreConverter : ValueConverter<EveMoney, decimal>
 {
 
-    public class MoneyTypeConverter : TypeConverter
-    {
-
-        public override bool CanConvertFrom( ITypeDescriptorContext? context, Type sourceType )
-            => (sourceType == typeof(string)) || base.CanConvertFrom(context, sourceType);
-
-        public override object? ConvertFrom
-            ( ITypeDescriptorContext? context, CultureInfo? culture, object value )
-        {
-            if(value is string str) {
-                string numericPart = new string([.. str.Where(c
-                    => char.IsDigit(c) || (c == '.') || (c == '-') || (c == '+'))]);
-                return new EveMoney(Value: decimal.Parse(numericPart), Currency: EveCurrency.);
-            }
-            return base.ConvertFrom(context, culture, value);
-        }
-
-    }
+    /// <summary>
+    ///  Initializes a new instance of the <see cref="EveMoneyEFCoreConverter" /> class.
+    /// </summary>
+    public EveMoneyEFCoreConverter()
+        : base(
+        v => v.Value,
+        v => new EveMoney(v, EveCurrency.USD)) // You must set the currency separately in your entity config
+    { }
 
 }
+

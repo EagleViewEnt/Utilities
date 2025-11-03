@@ -19,7 +19,6 @@
 using System;
 using System.Text.RegularExpressions;
 
-using EagleViewEnt.Utilities.Core.Extensions.Logger;
 using EagleViewEnt.Utilities.Core.Types.FilePath.Enums;
 
 using Serilog;
@@ -512,7 +511,6 @@ public static class EveFilePathExtensions
         } catch(Exception ex) {
             Log
             .ForContext("Path", filePath)
-            .WithCallingContext<EveFilePath>()
             .Error(ex, "Error saving text to file path");
         }
         return false;

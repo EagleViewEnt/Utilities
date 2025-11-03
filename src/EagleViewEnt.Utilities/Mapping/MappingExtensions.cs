@@ -16,15 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace EagleViewEnt.Utilities.Core.Extensions.Object;
+namespace EagleViewEnt.Utilities.Core.Mapping;
 
 /// <summary>
-///  Provides extension methods for mapping and copying properties between objects, as well as generating checksums for
-///  objects.
+///  Provides extension methods for mapping and serializing objects, including property mapping, type conversion, and
+///  checksum calculation.
 /// </summary>
 public static class MappingExtensions
 {
@@ -33,7 +32,6 @@ public static class MappingExtensions
     ///  Converts concrete implementations of <typeparam name="TInterface"></typeparam> from one to another
     /// </summary>
     /// <typeparam name="TDestination"></typeparam>
-    /// <typeparam name="TInterface"></typeparam>
     /// <param name="source"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
@@ -41,14 +39,14 @@ public static class MappingExtensions
                                where TInterface : class
     {
         if(source is not TInterface)
-                throw new ArgumentException($"Source must implement {typeof(TInterface).Name}");
+            throw new ArgumentException($"Source must implement {typeof(TInterface).Name}");
 
-        TDestination destination = new TDestination();
-        Type sourceType = source.GetType();
-        Type targetType = typeof(TDestination);
+        var destination = new TDestination();
+        var sourceType = source.GetType();
+        var targetType = typeof(TDestination);
 
-        foreach(PropertyInfo sourceProperty in sourceType.GetProperties()) {
-            PropertyInfo? targetProperty = targetType.GetProperty(sourceProperty.Name);
+        foreach(var sourceProperty in sourceType.GetProperties()) {
+            var targetProperty = targetType.GetProperty(sourceProperty.Name);
 
             // Check if the property exists in both source and destination
             if(targetProperty?.CanWrite ?? false) {
@@ -72,13 +70,11 @@ public static class MappingExtensions
     {
         ArgumentNullException.ThrowIfNull(obj);
 
-        string json = obj.ToJson();
+        string json = obj.AsJson();
 
         byte[] bytes = Encoding.UTF8.GetBytes(json);
 
-        using SHA256 sha256 = SHA256.Create();
-
-        byte[] hashBytes = sha256.ComputeHash(bytes);
+        byte[] hashBytes = SHA256.HashData(bytes);
 
         return Convert.ToHexStringLower(hashBytes);
     }
@@ -89,13 +85,13 @@ public static class MappingExtensions
     /// <param name="destination"></param>
     /// <param name="source"></param>
     public static void MapFrom( this object destination
-                                   , object source )
+                               , object source )
     {
-        Type sourceType = destination.GetType();
-        Type targetType = source.GetType();
+        var sourceType = destination.GetType();
+        var targetType = source.GetType();
 
-        foreach(PropertyInfo sourceProperty in sourceType.GetProperties()) {
-            PropertyInfo? targetProperty = targetType.GetProperty(sourceProperty.Name);
+        foreach(var sourceProperty in sourceType.GetProperties()) {
+            var targetProperty = targetType.GetProperty(sourceProperty.Name);
 
             // Check if the property exists in both source and destination
             if(targetProperty?.CanWrite ?? false) {
@@ -108,4 +104,3 @@ public static class MappingExtensions
     }
 
 }
-

@@ -19,7 +19,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace EagleViewEnt.Utilities.Core.Converters.DateAndTime;
+namespace EagleViewEnt.Utilities.Serialization.Json.Converters;
 
 /// <summary>
 ///  A <see cref="JsonConverter{T}" /> implementation for <see cref="DateTime" /> that: - Deserializes by calling <see
@@ -30,12 +30,11 @@ namespace EagleViewEnt.Utilities.Core.Converters.DateAndTime;
 ///  Important notes: - Parsing uses <see cref="DateTime.Parse(string)" />, which is culture-sensitive and may throw for
 ///  invalid or empty strings. - Serialization uses <see cref="DateTime.ToString()" />, which is also culture-sensitive
 ///  and not ISO 8601 by default. - If the JSON token is not a string, <see cref="Utf8JsonReader.GetString()" /> will
-///  throw <see cref="InvalidOperationException" />. Consider using <see
-///  cref="System.Text.Json.Serialization.JsonStringEnumConverter" />-style ISO 8601 formatting if interoperability is
-///  required.
+///  throw <see cref="InvalidOperationException" />. Consider using <see cref="JsonStringEnumConverter" />-style ISO
+///  8601 formatting if interoperability is required.
 /// </remarks>
 /// <example>
-///  Example usage with <see cref="JsonSerializerOptions" />: <code language="csharp"> var options = new
+///  Example usage with <see cref="JsonSerializerOptions" />: <code language="csharp">var options = new
 ///  JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }; options.Converters.Add(new
 ///  DateTimeConverterUsingDateTimeParse());  var json = JsonSerializer.Serialize(DateTime.Now, options); var dt   =
 ///  JsonSerializer.Deserialize&lt;DateTime&gt;(json, options);</code>

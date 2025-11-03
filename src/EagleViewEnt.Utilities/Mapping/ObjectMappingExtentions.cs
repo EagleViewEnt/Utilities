@@ -20,13 +20,17 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MgbUtilties.Serialization.Extensions.Object;
+namespace EagleViewEnt.Utilities.Mapping;
 
+/// <summary>
+///  Provides extension methods for mapping and copying properties between objects, as well as generating checksums for
+///  objects.
+/// </summary>
 public static class MappingExtensions
 {
 
     /// <summary>
-    ///  Converts concrete implementations of <typeparam name="TInterface"></typeparam> from one to another
+    ///  Converts concrete implementations of copying object from one to another
     /// </summary>
     /// <typeparam name="TDestination"></typeparam>
     /// <typeparam name="TInterface"></typeparam>
@@ -37,7 +41,7 @@ public static class MappingExtensions
                                where TInterface : class
     {
         if(source is not TInterface)
-            throw new ArgumentException($"Source must implement {typeof(TInterface).Name}");
+                throw new ArgumentException($"Source must implement {typeof(TInterface).Name}");
 
         TDestination destination = new TDestination();
         Type sourceType = source.GetType();
@@ -68,11 +72,13 @@ public static class MappingExtensions
     {
         ArgumentNullException.ThrowIfNull(obj);
 
-        string json = obj.AsJson();
+        string json = obj.ToJson();
 
         byte[] bytes = Encoding.UTF8.GetBytes(json);
 
-        byte[] hashBytes = SHA256.HashData(bytes);
+        using SHA256 sha256 = SHA256.Create();
+
+        byte[] hashBytes = sha256.ComputeHash(bytes);
 
         return Convert.ToHexStringLower(hashBytes);
     }
@@ -83,7 +89,7 @@ public static class MappingExtensions
     /// <param name="destination"></param>
     /// <param name="source"></param>
     public static void MapFrom( this object destination
-                               , object source )
+                                   , object source )
     {
         Type sourceType = destination.GetType();
         Type targetType = source.GetType();
@@ -102,3 +108,4 @@ public static class MappingExtensions
     }
 
 }
+

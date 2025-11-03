@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+
+		<!-- Package identity -->
+		<PackageId>EagleViewEnt.Utilities.Mapping</PackageId>
+		<Description>Mapping utilities for EagleViewEnt apps (extensions).</Description>
+		<PackageTags>EagleViewEnt;utilities;mapping</PackageTags>
+
+		<!-- Only set PackageIcon if the file exists -->
+		<PackageIcon Condition="Exists('icon.png')">icon.png</PackageIcon>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="/" Condition="Exists('README.md')" />
+		<None Include="icon.png" Pack="true" PackagePath="/" Condition="Exists('icon.png')" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Serilog" />
+
+	</ItemGroup>
+
+
+</Project>

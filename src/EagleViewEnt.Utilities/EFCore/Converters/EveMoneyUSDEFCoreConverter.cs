@@ -16,25 +16,28 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+using System;
 
-namespace EagleViewEnt.Utilities.Core.Extensions.JsInterop;
+using EagleViewEnt.Utilities.Core.Types.Money;
+
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+namespace EagleViewEnt.Utilites.EFCore.Converters;
 
 /// <summary>
-///  Provides extension methods for JavaScript interop operations.
+///  Converts <see cref="EveMoneyUsd" /> to and from <see cref="decimal" /> for use with Entity Framework Core, mapping
+///  the value to a T-SQL money column. The currency must be stored and set separately in your entity configuration.
 /// </summary>
-public static class JSInteropExtensions
+public class EveMoneyUsdEFCoreConverter : ValueConverter<EveMoneyUsd, decimal>
 {
 
     /// <summary>
-    ///  Sets focus to the specified <see cref="ElementReference" /> using JavaScript interop.
+    ///  Initializes a new instance of the <see cref="EveMoneyUsdEFCoreConverter" /> class.
     /// </summary>
-    /// <param name="jsRuntime">The JavaScript runtime instance.</param>
-    /// <param name="elementReference">The element to focus.</param>
-    /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
-    public static ValueTask FocusAsync( this IJSRuntime jsRuntime, ElementReference elementReference )
-        => jsRuntime.InvokeVoidAsync("BlazorSetFocus", elementReference);
+    public EveMoneyUsdEFCoreConverter()
+        : base(
+        v => v.Value,
+        v => new EveMoneyUsd(v)) // You must set the currency separately in your entity config
+    { }
 
 }
-

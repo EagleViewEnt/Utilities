@@ -49,9 +49,4 @@
     <Folder Include="Types\XmlString\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Core\MgbUtilties.Core.csproj" />
-    <ProjectReference Include="..\Serialization\MgbUtilties.Serialization.csproj" />
-  </ItemGroup>
-
 </Project>
